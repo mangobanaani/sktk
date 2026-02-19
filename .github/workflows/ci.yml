@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check src/ tests/
+      - run: ruff format --check src/ tests/
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: pytest --cov=sktk --cov-report=term-missing -q
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: mypy --strict src/sktk/
+
+  examples-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - name: Run offline examples
+        run: |
+          set -euo pipefail
+          examples=(
+            "examples/getting_started/01_basic_agent.py"
+            "examples/getting_started/02_persistent_session.py"
+            "examples/getting_started/03_tools_and_contracts.py"
+            "examples/getting_started/04_lifecycle_hooks.py"
+            "examples/concepts/agent/provider_router_fallback.py"
+            "examples/concepts/agent/approval_permissions_rate_limits.py"
+            "examples/concepts/agent/openapi_tools_end_to_end.py"
+            "examples/concepts/session/blackboard_shared_state.py"
+            "examples/concepts/knowledge/rag_with_chunking.py"
+            "examples/concepts/knowledge/retrieval_modes_comparison.py"
+            "examples/concepts/resilience/resilience_patterns.py"
+            "examples/concepts/observability/observability_stack.py"
+            "examples/concepts/observability/event_stream_logging.py"
+            "examples/concepts/testing/testing_patterns.py"
+            "examples/concepts/multi_agent/team_with_round_robin.py"
+            "examples/concepts/multi_agent/pipeline_topology.py"
+            "examples/concepts/multi_agent/custom_strategy.py"
+            "examples/concepts/multi_agent/guardrails_and_providers.py"
+            "examples/concepts/multi_agent/orchestration_patterns.py"
+          )
+          for example in "${examples[@]}"; do
+            echo "Running ${example}"
+            python "${example}"
+          done
+
+  performance-slo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - name: Run runtime benchmark SLO gate
+        run: |
+          python benchmarks/agent_runtime_benchmark.py \
+            --iterations 400 \
+            --warmup 40 \
+            --max-p95-ms 5.0 \
+            --min-qps 10000
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install bandit
+      - run: bandit -r src/sktk/ -c pyproject.toml
+
+  aikido:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aikido Security Scan
+        uses: AikidoSec/github-actions-workflow@v1.0.13
+        with:
+          secret-key: ${{ secrets.AIKIDO_SECRET_KEY }}
+          fail-on-dependency-scan: true
+          fail-on-sast-scan: true
+          fail-on-iac-scan: false
+          minimum-severity: "HIGH"
+          timeout-seconds: 300

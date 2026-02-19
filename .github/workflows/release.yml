@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      dry_run:
+        description: "Dry run (skip tag/release)"
+        required: false
+        type: boolean
+        default: false
+      acknowledge_breaking:
+        description: "Required for major releases"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install tools
+        run: pip install hatch build
+
+      - name: Get current version
+        id: current
+        run: |
+          VERSION=$(python -c "import re; print(re.search(r'__version__ = \"(.+?)\"', open('src/sktk/__init__.py').read()).group(1))")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Current version: $VERSION"
+
+      - name: Compute next version
+        id: next
+        run: |
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${{ steps.current.outputs.version }}"
+          case "${{ inputs.bump }}" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+          NEXT="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          echo "Next version: $NEXT"
+
+      - name: Validate major release acknowledgement
+        run: |
+          if [ "${{ inputs.bump }}" = "major" ] && [ "${{ inputs.acknowledge_breaking }}" != "true" ]; then
+            echo "Major releases require acknowledge_breaking=true"
+            exit 1
+          fi
+
+      - name: Ensure changelog exists
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            printf '%s\n\n%s\n' \
+              "# Changelog" \
+              "All notable changes to this project will be documented in this file." \
+              > CHANGELOG.md
+          fi
+
+      - name: Bump version in source
+        run: |
+          sed -i "s/__version__ = \".*\"/__version__ = \"${{ steps.next.outputs.version }}\"/" src/sktk/__init__.py
+          sed -i "s/^version = \".*\"/version = \"${{ steps.next.outputs.version }}\"/" pyproject.toml
+
+      - name: Update changelog section
+        run: |
+          VERSION="v${{ steps.next.outputs.version }}"
+          DATE="$(date -u +%Y-%m-%d)"
+          LAST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          if [ -n "$LAST_TAG" ]; then
+            COMMITS="$(git log "${LAST_TAG}..HEAD" --pretty=format:'- %s (%h)' || true)"
+          else
+            COMMITS="$(git log --pretty=format:'- %s (%h)' || true)"
+          fi
+          if [ -z "$COMMITS" ]; then
+            COMMITS="- No user-facing changes recorded."
+          fi
+          {
+            head -n 1 CHANGELOG.md
+            echo
+            echo "## ${VERSION} - ${DATE}"
+            echo
+            echo "${COMMITS}"
+            echo
+            tail -n +2 CHANGELOG.md
+          } > CHANGELOG.new
+          mv CHANGELOG.new CHANGELOG.md
+
+      - name: Build package
+        run: python -m build
+
+      - name: Commit and tag
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/sktk/__init__.py pyproject.toml CHANGELOG.md
+          git commit -m "release v${{ steps.next.outputs.version }}"
+          git tag "v${{ steps.next.outputs.version }}"
+          git push origin HEAD --tags
+
+      - name: Create GitHub release
+        if: ${{ !inputs.dry_run }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.next.outputs.version }}"
+          name: "v${{ steps.next.outputs.version }}"
+          generate_release_notes: true
+          files: dist/*
