@@ -380,4 +380,4 @@ Runtime baselines live in [`benchmarks/`](benchmarks/README.md).
 
 ## License
 
-[GPL-3.0](LICENSE)
+[MIT](LICENSE)

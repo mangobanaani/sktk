@@ -2,7 +2,7 @@
 name = "sktk"
 version = "0.1.0"
 description = "Production-grade Semantic Kernel. Without the boilerplate."
-license = {text = "GPL-3.0-only"}
+license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "SKTK Contributors"}]
@@ -10,7 +10,7 @@ keywords = ["semantic-kernel", "llm", "agents", "rag", "orchestration"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
