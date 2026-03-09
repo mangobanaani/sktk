@@ -110,3 +110,15 @@ skips = ["B101"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+
+[[tool.mypy.overrides]]
+module = ["redis", "redis.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "aiosqlite"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "sktk.session.backends.redis"
+disable_error_code = ["no-untyped-call"]

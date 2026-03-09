@@ -36,7 +36,7 @@ class RedisHistory(ConversationHistory):
                     "Redis support requires the 'redis' package. "
                     "Install it with: pip install skat[redis]"
                 ) from e
-            self._client = aioredis.from_url(self._url)  # type: ignore[no-untyped-call]
+            self._client = aioredis.from_url(self._url)
             self._count = await self._client.llen(self._key)
 
     async def append(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> None:

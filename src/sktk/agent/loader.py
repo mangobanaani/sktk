@@ -127,7 +127,7 @@ def load_agent_from_yaml(path: str | Path) -> SKTKAgent:
     Requires PyYAML (pip install pyyaml).
     """
     try:
-        import yaml  # type: ignore[import-untyped]
+        import yaml
     except ImportError as e:
         raise ImportError(
             "YAML agent definitions require PyYAML. Install with: pip install pyyaml"

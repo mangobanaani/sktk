@@ -21,7 +21,7 @@ class TokenUsage(BaseModel):
     completion_tokens: int = 0
     total_cost_usd: float | None = None
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def total_tokens(self) -> int:
         return self.prompt_tokens + self.completion_tokens

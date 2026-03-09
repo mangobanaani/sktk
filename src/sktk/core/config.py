@@ -176,7 +176,7 @@ class SKTKConfig:
     def from_yaml(cls, path: str | Path) -> SKTKConfig:
         """Load configuration from a YAML file."""
         try:
-            import yaml  # type: ignore[import-untyped]
+            import yaml
         except ImportError as e:
             raise ImportError("YAML config requires PyYAML: pip install pyyaml") from e
 

@@ -30,7 +30,7 @@ def expose_as_mcp_server(agent: SKTKAgent) -> Any:
 
     server = Server(agent.name)
 
-    @server.list_tools()  # type: ignore[misc, no-untyped-call]
+    @server.list_tools()  # type: ignore[untyped-decorator, no-untyped-call]
     async def list_tools() -> list[MCPTool]:
         tools = []
         # Expose agent tools
@@ -58,7 +58,7 @@ def expose_as_mcp_server(agent: SKTKAgent) -> Any:
         )
         return tools
 
-    @server.call_tool()  # type: ignore[misc]
+    @server.call_tool()  # type: ignore[untyped-decorator]
     async def call_tool(name: str, arguments: dict[str, Any] | None = None) -> list[TextContent]:
         arguments = arguments or {}
         try:
