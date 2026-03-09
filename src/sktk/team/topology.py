@@ -53,7 +53,7 @@ class AgentNode:
 
     async def run(self, message: str, **kwargs: Any) -> str:
         """Invoke the wrapped agent with the given message."""
-        return await self.agent.invoke(message, **kwargs)
+        return str(await self.agent.invoke(message, **kwargs))
 
     def visualize(self) -> str:
         """Return a Mermaid-formatted label for this agent node."""
@@ -85,7 +85,7 @@ class SequentialNode:
         if isinstance(left_result, list):
             left_result = "\n".join(str(r) for r in left_result)
         try:
-            return await self.right.run(str(left_result), **kwargs)
+            return str(await self.right.run(str(left_result), **kwargs))
         except Exception:
             logger.error("Sequential pipeline failed at right node")
             raise

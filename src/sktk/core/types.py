@@ -22,7 +22,7 @@ class TokenUsage(BaseModel):
     total_cost_usd: float | None = None
 
     @computed_field
-    @property
+    @property  # type: ignore[prop-decorator]
     def total_tokens(self) -> int:
         return self.prompt_tokens + self.completion_tokens
 
@@ -71,7 +71,7 @@ async def maybe_await(value: Awaitable[T]) -> T: ...
 async def maybe_await(value: T) -> T: ...
 
 
-async def maybe_await(value):  # type: ignore[misc]
+async def maybe_await(value):  # type: ignore[no-untyped-def]
     """Await value if it's awaitable, otherwise return as-is."""
     if hasattr(value, "__await__"):
         return await value

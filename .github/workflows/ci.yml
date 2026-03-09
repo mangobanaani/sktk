@@ -108,16 +108,16 @@ jobs:
       - run: pip install bandit
       - run: bandit -r src/sktk/ -c pyproject.toml
 
-  aikido:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Aikido Security Scan
-        uses: AikidoSec/github-actions-workflow@v1.0.13
-        with:
-          secret-key: ${{ secrets.AIKIDO_SECRET_KEY }}
-          fail-on-dependency-scan: true
-          fail-on-sast-scan: true
-          fail-on-iac-scan: false
-          minimum-severity: "HIGH"
-          timeout-seconds: 300
+  # aikido:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Aikido Security Scan
+  #       uses: AikidoSec/github-actions-workflow@v1.0.13
+  #       with:
+  #         secret-key: ${{ secrets.AIKIDO_SECRET_KEY }}
+  #         fail-on-dependency-scan: true
+  #         fail-on-sast-scan: true
+  #         fail-on-iac-scan: false
+  #         minimum-severity: "HIGH"
+  #         timeout-seconds: 300

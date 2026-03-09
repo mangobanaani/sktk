@@ -731,7 +731,7 @@ async def _execute_with_retry(
             last_exc = exc
             if attempt == retries:
                 raise
-            sleep_for = delay * (backoff**attempt) + random.uniform(0, jitter)
+            sleep_for = delay * (backoff**attempt) + random.uniform(0, jitter)  # nosec B311 - used for retry jitter, not cryptography
             await asyncio.sleep(sleep_for)
     if last_exc:
         raise last_exc

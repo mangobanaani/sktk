@@ -136,7 +136,7 @@ class ComposedStrategy:
             if hasattr(strategy, "get_all_agents"):
                 try:
                     result = strategy.get_all_agents(agents)  # type: ignore[union-attr]
-                except Exception:
+                except Exception:  # nosec B112 - intentional: skip to next strategy on failure
                     continue
                 if result:
                     return result

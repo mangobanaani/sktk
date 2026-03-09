@@ -14,11 +14,11 @@ from typing import Any
 try:
     from pydantic import BaseModel, Field, ValidationError, field_validator
 except ImportError:
-    BaseModel = object  # Fallback if pydantic not available
-    Field = field
-    ValidationError = ValueError
+    BaseModel = object  # type: ignore[assignment]  # Fallback if pydantic not available
+    Field = field  # type: ignore[assignment]
+    ValidationError = ValueError  # type: ignore[assignment]
 
-    def field_validator(*args: Any, **kwargs: Any):  # type: ignore[override]
+    def field_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-redef]
         def _decorator(func: Any) -> Any:
             return func
 
@@ -46,13 +46,13 @@ class _ModelConfigPydantic(BaseModel):
     api_key: str = Field(default="", description="API key for the provider")
 
     @field_validator("temperature")
-    def validate_temperature(cls, v):
+    def validate_temperature(cls, v: float) -> float:
         if not 0.0 <= v <= 1.0:
             raise ValueError("temperature must be between 0.0 and 1.0")
         return v
 
     @field_validator("max_tokens")
-    def validate_max_tokens(cls, v):
+    def validate_max_tokens(cls, v: int) -> int:
         if v < 1 or v > 8192:
             raise ValueError("max_tokens must be between 1 and 8192")
         return v

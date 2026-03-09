@@ -10,7 +10,7 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from sktk.agent.filters import FilterContext
 from sktk.core.types import Allow, FilterResult, Modify
@@ -73,7 +73,7 @@ class SemanticMemory:
         await self._kb.add_source(TextSource(content=content, name=source_name))
         logger.debug("Remembered: %s (version %d)", key, version)
 
-    async def recall(self, query: str, top_k: int = 5) -> list[dict[str, str | float]]:
+    async def recall(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
         """Retrieve relevant memories by semantic similarity.
 
         Filters out results from superseded (stale) memory versions so
@@ -160,7 +160,7 @@ class MemoryGroundingFilter:
     async def on_input(self, context: FilterContext) -> FilterResult:
         """Retrieve relevant memories and prepend to input."""
         results = await self._memory.recall(context.content, top_k=self._top_k)
-        relevant = [r for r in results if r["score"] >= self._min_score]
+        relevant = [r for r in results if float(r["score"]) >= self._min_score]
         if not relevant:
             return Allow()
         memories_text = "\n".join(f"- {r['text']}" for r in relevant)

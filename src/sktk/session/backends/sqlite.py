@@ -112,7 +112,7 @@ class SQLiteHistory(ConversationHistory):
                     placeholders = ",".join("?" * len(roles))
                     where += f" AND role IN ({placeholders})"
                     params.extend(roles)
-                query = f"SELECT role, content, metadata FROM messages {where}"
+                query = f"SELECT role, content, metadata FROM messages {where}"  # nosec B608 - where clause built from hardcoded strings and parameterized placeholders only
                 if safe_limit is not None:
                     query += " ORDER BY id DESC LIMIT ?"
                     params.append(safe_limit)

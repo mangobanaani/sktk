@@ -84,7 +84,7 @@ class Message:
         """Convert to a provider-friendly dict format."""
         if all(isinstance(b, TextBlock) for b in self.content):
             return {"role": self.role, "content": self.text()}
-        blocks = []
+        blocks: list[dict[str, Any]] = []
         for block in self.content:
             if isinstance(block, TextBlock):
                 blocks.append({"type": "text", "text": block.text})

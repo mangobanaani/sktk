@@ -97,6 +97,8 @@ def test_record_metric_stores_samples():
     assert len(samples) == 2
     assert samples[0]["value"] == 1.23
     assert samples[1]["tags"]["agent"] == "a2"
+
+
 def test_get_metric_samples_returns_defensive_copies():
     from sktk.observability.metrics import get_metric_samples, record_metric, reset_metrics
 
@@ -148,6 +150,8 @@ def test_reset_metrics_restores_default_max_samples():
     record_metric("m", 1, None)
     record_metric("m", 2, None)
     assert [s["value"] for s in get_metric_samples("m")] == [1.0, 2.0]
+
+
 @pytest.mark.asyncio
 async def test_token_tracker_filter_by_model():
     tracker = TokenTracker()

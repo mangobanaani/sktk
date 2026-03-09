@@ -29,6 +29,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
             continue
         item.add_marker(pytest.mark.skip(reason="SKTK_RUN_INTEGRATION not enabled"))
 
+
 MODEL = os.environ.get("SKTK_TEST_MODEL", "claude-haiku-4-5-20251001")
 MAX_TOKENS = 256
 

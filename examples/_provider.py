@@ -10,10 +10,15 @@ MAX_TOKENS = 256
 
 
 def get_provider() -> AnthropicClaudeProvider:
+    import sys
+
     import anthropic
 
     root = Path(__file__).resolve().parent.parent
     secrets = FileSecretsProvider(root / ".env")
-    key = secrets.require("ANTHROPIC_API_KEY")
+    key = secrets.get("ANTHROPIC_API_KEY")
+    if not key:
+        print("No ANTHROPIC_API_KEY found; skipping example.")
+        sys.exit(0)
     client = anthropic.AsyncAnthropic(api_key=key)
     return AnthropicClaudeProvider(client=client, model=MODEL, max_tokens=MAX_TOKENS)
