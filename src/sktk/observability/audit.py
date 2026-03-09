@@ -150,7 +150,7 @@ class AuditTrail:
             }
             entry_hash = self._compute_hash(entry_data, self._last_hash)
             entry = AuditEntry(
-                **entry_data,
+                **entry_data,  # type: ignore[arg-type]
                 previous_hash=self._last_hash,
                 entry_hash=entry_hash,
             )

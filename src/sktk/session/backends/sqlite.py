@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import sqlite3
+from typing import Any
 
 from sktk.session.history import ConversationHistory
 
@@ -79,7 +80,7 @@ class SQLiteHistory(ConversationHistory):
                 self._conn = None
                 await asyncio.to_thread(conn.close)
 
-    async def append(self, role: str, content: str, metadata: dict | None = None) -> None:
+    async def append(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> None:
         """Insert a message row, offloading the blocking SQL write to a thread."""
         meta_json = json.dumps(metadata or {})
         sid = self._session_id
@@ -97,7 +98,7 @@ class SQLiteHistory(ConversationHistory):
             await asyncio.to_thread(_append)
             self._count += 1
 
-    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict]:
+    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict[str, Any]]:
         """Query messages, optionally filtered by role and limited to the N most recent."""
         sid = self._session_id
         safe_limit = int(limit) if limit is not None else None
@@ -105,9 +106,9 @@ class SQLiteHistory(ConversationHistory):
         async with self._lock:
             conn = await self._ensure_initialized()
 
-            def _get() -> list[dict]:
+            def _get() -> list[dict[str, Any]]:
                 where = "WHERE session_id = ?"
-                params: list = [sid]
+                params: list[Any] = [sid]
                 if roles:
                     placeholders = ",".join("?" * len(roles))
                     where += f" AND role IN ({placeholders})"

@@ -25,7 +25,7 @@ class MockKernel:
         return self._responses.popleft()
 
     def expect_function(
-        self, plugin: str, function: str, return_value: Any, assert_args: dict | None = None
+        self, plugin: str, function: str, return_value: Any, assert_args: dict[str, Any] | None = None
     ) -> None:
         """Register an expected function call with its canned return value."""
         self._function_expectations.append(
@@ -37,7 +37,7 @@ class MockKernel:
             }
         )
 
-    def record_function_call(self, plugin: str, function: str, args: dict) -> Any:
+    def record_function_call(self, plugin: str, function: str, args: dict[str, Any]) -> Any:
         """Record a function call and return the matching expected value, or fail."""
         self._function_calls.append({"plugin": plugin, "function": function, "args": args})
         for i, exp in enumerate(self._function_expectations):

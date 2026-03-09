@@ -125,7 +125,7 @@ class TokenQuotaFilter:
 
     def _get_key(self, context: FilterContext) -> str:
         """Extract the quota key (e.g. user_id, session_id) from filter context."""
-        return context.metadata.get(self._key_field, "default")
+        return str(context.metadata.get(self._key_field, "default"))
 
     async def on_input(self, context: FilterContext) -> FilterResult:
         """Deny input if projected token usage would exceed the combined quota.

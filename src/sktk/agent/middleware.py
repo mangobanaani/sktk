@@ -53,7 +53,7 @@ class MiddlewareStack:
             async def call_chain(msg: str) -> Any:
                 return await invoke_fn(msg, **kwargs)
 
-            chain = call_chain
+            chain: Callable[..., Awaitable[Any]] = call_chain
             # Build chain inside-out: reverse so first-added middleware runs outermost
             for mw in reversed(self._middleware):
                 prev = chain

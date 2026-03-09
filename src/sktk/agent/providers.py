@@ -154,7 +154,7 @@ class AzureOpenAIProvider:
                 **params,
             )
         )
-        text = response.choices[0].message.content  # type: ignore[attr-defined]
+        text = response.choices[0].message.content
         usage = _usage_from_openai(response)
         return CompletionResult(
             text=text,
@@ -305,7 +305,7 @@ class GeminiProvider:
             params["generation_config"] = generation_config
 
         response = await maybe_await(gm.generate_content(messages, **params))
-        text = response.text  # type: ignore[attr-defined]
+        text = response.text
         usage = _usage_from_gemini(response)
         return CompletionResult(text=text, usage=usage, metadata={"model": self._model})
 
@@ -491,7 +491,7 @@ class OpenAIProvider:
                 **params,
             )
         )
-        text = response.choices[0].message.content  # type: ignore[attr-defined]
+        text = response.choices[0].message.content
         usage = _usage_from_openai(response)
         return CompletionResult(
             text=text,

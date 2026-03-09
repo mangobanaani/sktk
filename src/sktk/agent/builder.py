@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Any, Iterable
 
 from sktk.agent.agent import SKTKAgent
 from sktk.agent.capabilities import Capability
@@ -17,7 +17,7 @@ DEFAULT_BLOCKED_PATTERNS = [
 ]
 
 
-def default_safety_filters(blocked_patterns: Iterable[str] | None = None):
+def default_safety_filters(blocked_patterns: Iterable[str] | None = None) -> list[Any]:
     """Return the default guardrail filter stack for safe agents."""
 
     patterns = list(DEFAULT_BLOCKED_PATTERNS if blocked_patterns is None else blocked_patterns)

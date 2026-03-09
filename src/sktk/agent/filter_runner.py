@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from sktk.agent.filters import AgentFilter, FilterContext, run_chunk_filters, run_filter_pipeline
 from sktk.core.errors import GuardrailException
 from sktk.core.types import Deny, Modify
@@ -79,7 +81,7 @@ class FilterRunner:
                 reason=chunk_result.reason, filter_name="output_chunk_pipeline"
             )
 
-    async def run_function_call(self, name: str, arguments: dict) -> None:
+    async def run_function_call(self, name: str, arguments: dict[str, Any]) -> None:
         """Run function-call filters.
 
         Raises :class:`GuardrailException` if a filter denies the call.

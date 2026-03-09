@@ -48,7 +48,7 @@ def parse_output(raw: str, model: type[T]) -> T:
         raise ContractValidationError(
             model_name=model.__name__,
             raw_output=raw,
-            validation_errors=e.errors(),
+            validation_errors=e.errors(),  # type: ignore[arg-type]
         ) from e
 
 

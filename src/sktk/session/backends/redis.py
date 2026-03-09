@@ -36,10 +36,10 @@ class RedisHistory(ConversationHistory):
                     "Redis support requires the 'redis' package. "
                     "Install it with: pip install skat[redis]"
                 ) from e
-            self._client = aioredis.from_url(self._url)
+            self._client = aioredis.from_url(self._url)  # type: ignore[no-untyped-call]
             self._count = await self._client.llen(self._key)
 
-    async def append(self, role: str, content: str, metadata: dict | None = None) -> None:
+    async def append(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> None:
         """Append a message to the Redis list.
 
         The lock is held across client initialisation, the rpush, and
@@ -52,7 +52,7 @@ class RedisHistory(ConversationHistory):
             await self._client.rpush(self._key, message)
             self._count += 1
 
-    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict]:
+    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict[str, Any]]:
         """Retrieve messages, optionally filtered by role and limited to the N most recent.
 
         The lock is held across client initialisation, the lrange call,

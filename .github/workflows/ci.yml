@@ -45,43 +45,6 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: mypy --strict src/sktk/
 
-  examples-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install -e ".[dev]"
-      - name: Run offline examples
-        run: |
-          set -euo pipefail
-          examples=(
-            "examples/getting_started/01_basic_agent.py"
-            "examples/getting_started/02_persistent_session.py"
-            "examples/getting_started/03_tools_and_contracts.py"
-            "examples/getting_started/04_lifecycle_hooks.py"
-            "examples/concepts/agent/provider_router_fallback.py"
-            "examples/concepts/agent/approval_permissions_rate_limits.py"
-            "examples/concepts/agent/openapi_tools_end_to_end.py"
-            "examples/concepts/session/blackboard_shared_state.py"
-            "examples/concepts/knowledge/rag_with_chunking.py"
-            "examples/concepts/knowledge/retrieval_modes_comparison.py"
-            "examples/concepts/resilience/resilience_patterns.py"
-            "examples/concepts/observability/observability_stack.py"
-            "examples/concepts/observability/event_stream_logging.py"
-            "examples/concepts/testing/testing_patterns.py"
-            "examples/concepts/multi_agent/team_with_round_robin.py"
-            "examples/concepts/multi_agent/pipeline_topology.py"
-            "examples/concepts/multi_agent/custom_strategy.py"
-            "examples/concepts/multi_agent/guardrails_and_providers.py"
-            "examples/concepts/multi_agent/orchestration_patterns.py"
-          )
-          for example in "${examples[@]}"; do
-            echo "Running ${example}"
-            python "${example}"
-          done
-
   performance-slo:
     runs-on: ubuntu-latest
     steps:

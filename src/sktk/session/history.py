@@ -3,18 +3,19 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class ConversationHistory(ABC):
     """Interface for append/query/fork operations on conversation transcripts."""
 
     @abstractmethod
-    async def append(self, role: str, content: str, metadata: dict | None = None) -> None:
+    async def append(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> None:
         """Add a message to the conversation history."""
         ...
 
     @abstractmethod
-    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict]:
+    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict[str, Any]]:
         """Return messages, optionally filtered by role and limited to the N most recent."""
         ...
 

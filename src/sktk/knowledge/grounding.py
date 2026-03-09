@@ -56,10 +56,10 @@ class GroundingFilter:
         """Extract text from a result (ScoredChunk, dict, or string)."""
         # ScoredChunk with .chunk.text
         if hasattr(result, "chunk") and hasattr(result.chunk, "text"):
-            return result.chunk.text
+            return str(result.chunk.text)
         # Dict with text/content
         if isinstance(result, dict):
-            return result.get("text", result.get("content", ""))
+            return str(result.get("text") or result.get("content") or "")
         # String
         if isinstance(result, str):
             return result
@@ -79,9 +79,9 @@ class GroundingFilter:
     def _get_score(self, result: Any) -> float:
         """Return the relevance score from a result, defaulting to 1.0."""
         if hasattr(result, "score"):
-            return result.score
+            return float(result.score)
         if isinstance(result, dict):
-            return result.get("score", 1.0)
+            return float(result.get("score", 1.0))
         return 1.0
 
     async def on_input(self, context: FilterContext) -> FilterResult:
@@ -112,7 +112,7 @@ class GroundingFilter:
         selected: list[str] = []
         used = 0
         for part in context_parts:
-            tokens = self._approx_tokens(part)
+            tokens = self._approx_tokens(part)  # type: ignore[no-untyped-call]
             if used + tokens > budget_tokens:
                 break
             selected.append(part)

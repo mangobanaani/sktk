@@ -92,9 +92,9 @@ def _build_parameters(
             prop = _deref(prop, spec)
             # Disambiguate body properties that collide with parameter names
             key = _BODY_PREFIX + name if name in param_names else name
-            props[key] = {"type": prop.get("type", "string")}
+            props[key] = {"type": prop.get("type", "string")}  # type: ignore[index]
             if prop.get("description"):
-                props[key]["description"] = prop["description"]
+                props[key]["description"] = prop["description"]  # type: ignore[index]
         if body_schema.get("required"):
             for r in body_schema["required"]:
                 required.append(_BODY_PREFIX + r if r in param_names else r)
@@ -325,7 +325,7 @@ def tools_from_openapi_file(
 
     if path.suffix in (".yaml", ".yml"):
         try:
-            import yaml
+            import yaml  # type: ignore[import-untyped]
         except ImportError as e:
             raise ImportError("YAML support requires PyYAML: pip install pyyaml") from e
         spec = yaml.safe_load(content)

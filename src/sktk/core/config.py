@@ -14,9 +14,9 @@ from typing import Any
 try:
     from pydantic import BaseModel, Field, ValidationError, field_validator
 except ImportError:
-    BaseModel = object  # type: ignore[assignment]  # Fallback if pydantic not available
+    BaseModel = object  # type: ignore[assignment, misc]  # Fallback if pydantic not available
     Field = field  # type: ignore[assignment]
-    ValidationError = ValueError  # type: ignore[assignment]
+    ValidationError = ValueError  # type: ignore[assignment, misc]
 
     def field_validator(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-redef]
         def _decorator(func: Any) -> Any:
@@ -176,7 +176,7 @@ class SKTKConfig:
     def from_yaml(cls, path: str | Path) -> SKTKConfig:
         """Load configuration from a YAML file."""
         try:
-            import yaml
+            import yaml  # type: ignore[import-untyped]
         except ImportError as e:
             raise ImportError("YAML config requires PyYAML: pip install pyyaml") from e
 

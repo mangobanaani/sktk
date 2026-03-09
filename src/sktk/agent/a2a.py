@@ -106,7 +106,7 @@ class A2AClient:
         if artifacts:
             parts = artifacts[0].get("parts", [])
             if parts:
-                return parts[0].get("text", str(data))
+                return str(parts[0].get("text", str(data)))
         return str(data)
 
     async def close(self) -> None:

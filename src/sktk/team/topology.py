@@ -34,7 +34,7 @@ def _normalize_rshift_operand(
 
     if isinstance(other, SA):
         return AgentNode(agent=other)
-    return NotImplemented  # type: ignore[return-value]
+    return NotImplemented
 
 
 @dataclass
@@ -48,7 +48,7 @@ class AgentNode:
     ) -> SequentialNode:
         right = _normalize_rshift_operand(other)
         if right is NotImplemented:
-            return NotImplemented  # type: ignore[return-value]
+            return NotImplemented
         return SequentialNode(self, right)
 
     async def run(self, message: str, **kwargs: Any) -> str:
@@ -72,7 +72,7 @@ class SequentialNode:
     ) -> SequentialNode:
         right = _normalize_rshift_operand(other)
         if right is NotImplemented:
-            return NotImplemented  # type: ignore[return-value]
+            return NotImplemented
         return SequentialNode(self, right)
 
     async def run(self, message: str, **kwargs: Any) -> str:
@@ -100,12 +100,12 @@ class SequentialNode:
         left_id = (
             self.left._build_mermaid(lines, counter)
             if hasattr(self.left, "_build_mermaid")
-            else self.left.agent.name  # type: ignore[union-attr]
+            else self.left.agent.name
         )
         right_id = (
             self.right._build_mermaid(lines, counter)
             if hasattr(self.right, "_build_mermaid")
-            else self.right.agent.name  # type: ignore[union-attr]
+            else self.right.agent.name
         )
         lines.append(f"    {left_id} --> {right_id}")
         return right_id
@@ -122,7 +122,7 @@ class ParallelNode:
     ) -> SequentialNode:
         right = _normalize_rshift_operand(other)
         if right is NotImplemented:
-            return NotImplemented  # type: ignore[return-value]
+            return NotImplemented
         return SequentialNode(self, right)
 
     async def run(self, message: str, **kwargs: Any) -> list[Any]:
@@ -148,7 +148,7 @@ class ParallelNode:
             if hasattr(node, "_build_mermaid"):
                 names.append(node._build_mermaid(lines, counter))
             elif hasattr(node, "agent"):
-                names.append(node.agent.name)  # type: ignore[union-attr]
+                names.append(node.agent.name)
             else:
                 counter[0] += 1
                 names.append(f"group_{counter[0]}")

@@ -452,7 +452,7 @@ class _SQLiteBackend:
     async def _ensure_db(self) -> Any:
         if self._conn is None:
             try:
-                import aiosqlite  # type: ignore
+                import aiosqlite
             except ModuleNotFoundError:  # pragma: no cover - exercised in tests
                 if not self._warned_fallback:
                     logger.info("aiosqlite not installed; using synchronous sqlite fallback")
@@ -460,7 +460,7 @@ class _SQLiteBackend:
                 loop = asyncio.get_running_loop()
                 raw = await loop.run_in_executor(
                     self._executor,
-                    lambda: sqlite3.connect(self._path, check_same_thread=False),  # type: ignore[arg-type]
+                    lambda: sqlite3.connect(self._path, check_same_thread=False),
                 )
                 self._conn = _SQLiteSyncAdapter(raw, self._executor)
                 await self._conn.execute("PRAGMA journal_mode=WAL")
@@ -530,7 +530,7 @@ class _SQLiteBackend:
             )
             row = await cursor.fetchone()
             if row:
-                return json.loads(row[0])
+                return json.loads(row[0])  # type: ignore[no-any-return]
             return None
 
     async def list_checkpoints(self, workflow_id: str) -> list[dict[str, Any]]:
@@ -579,7 +579,7 @@ class _SQLiteSyncAdapter:
         self._conn = conn
         self._executor = executor
 
-    async def execute(self, sql: str, params: tuple[Any, ...] | list[Any] = ()):
+    async def execute(self, sql: str, params: tuple[Any, ...] | list[Any] = ()) -> _SQLiteCursorAdapter:
         loop = asyncio.get_running_loop()
         cursor = await loop.run_in_executor(self._executor, self._conn.execute, sql, params)
         return _SQLiteCursorAdapter(cursor, self._executor)
@@ -598,14 +598,14 @@ class _SQLiteCursorAdapter:
         self._cursor = cursor
         self._executor = executor
 
-    async def fetchone(self):
+    async def fetchone(self) -> Any:
         loop = asyncio.get_running_loop()
         try:
             return await loop.run_in_executor(self._executor, self._cursor.fetchone)
         finally:
             await loop.run_in_executor(self._executor, self._cursor.close)
 
-    async def fetchall(self):
+    async def fetchall(self) -> list[Any]:
         loop = asyncio.get_running_loop()
         try:
             return await loop.run_in_executor(self._executor, self._cursor.fetchall)
@@ -649,7 +649,7 @@ class _MaybeSpan:
         self._cfg = cfg
         self._name = name
         self._attrs = attrs
-        self._ctx = None
+        self._ctx: Any = None
 
     async def __aenter__(self) -> Any:
         if not self._cfg.trace_enabled:

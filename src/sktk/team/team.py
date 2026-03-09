@@ -40,7 +40,7 @@ class SKTKTeam:
             return self.agents
         if hasattr(self.strategy, "get_all_agents"):
             try:
-                result = self.strategy.get_all_agents(self.agents)  # type: ignore[arg-type]
+                result = self.strategy.get_all_agents(self.agents)
                 return result or None
             except Exception:
                 return None
@@ -164,6 +164,7 @@ class SKTKTeam:
         total_usage: TokenUsage | None = None
         last_agent: SKTKAgent | None = None
 
+        result: Any
         broadcast_agents = self._get_broadcast_agents()
         if broadcast_agents is not None:
             raw = await asyncio.gather(
@@ -188,24 +189,24 @@ class SKTKTeam:
         else:
             last_result = task
             for _round_num in range(self.max_rounds):
-                agent = await self.strategy.next_agent(
+                next_agent: SKTKAgent | None = await self.strategy.next_agent(
                     self.agents,
                     self.session.history if self.session else None,
                     last_result,
                     **kwargs,
                 )
-                if agent is None:
+                if next_agent is None:
                     break
-                last_agent = agent
+                last_agent = next_agent
                 actual_rounds += 1
-                result = await agent.invoke(last_result)
-                usage = getattr(agent, "_last_usage", None)
+                agent_result = await next_agent.invoke(last_result)
+                usage = getattr(next_agent, "_last_usage", None)
                 if usage is not None:
                     total_usage = usage if total_usage is None else total_usage + usage
-                msg_event = self._make_message_event(agent, result, cid)
+                msg_event = self._make_message_event(next_agent, agent_result, cid)
                 await self._event_stream.emit(msg_event)
                 yield msg_event
-                last_result = str(result)
+                last_result = str(agent_result)
             result = last_result
 
         duration = time.monotonic() - start

@@ -105,7 +105,7 @@ def load_prompt(path: str | Path) -> PromptTemplate:
             frontmatter = parts[1]
             text = parts[2].strip()
             try:
-                import yaml  # type: ignore
+                import yaml  # type: ignore[import-untyped]
 
                 fm = yaml.safe_load(frontmatter) or {}
                 if isinstance(fm, dict):

@@ -147,7 +147,7 @@ class GraphWorkflow:
         if self._entry is None:
             raise ValueError("No nodes in workflow")
 
-        current = self._entry
+        current: str | None = self._entry
         iteration = 0
 
         while current is not None and iteration < self._max_iterations:

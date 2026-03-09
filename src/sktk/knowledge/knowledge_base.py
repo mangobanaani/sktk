@@ -218,12 +218,13 @@ class KnowledgeBase:
             )
         if retrieval_event_emitter is not None:
             top_score = results[0].score if results else 0.0
+            _ctx = get_context()
             event = RetrievalEvent(
                 agent=agent_name,
                 query=query,
                 chunks_retrieved=len(results),
                 top_score=top_score,
-                correlation_id=(get_context().correlation_id if get_context() else ""),
+                correlation_id=(_ctx.correlation_id if _ctx else ""),
                 timestamp=datetime.now(UTC),
             )
             await _maybe_call(retrieval_event_emitter, event)
@@ -315,7 +316,7 @@ class KnowledgeBase:
         if not embeddings:
             return self._backend or InMemoryKnowledgeBackend()
         if self._backend_name == "faiss":
-            from sktk.knowledge import FaissBackend  # type: ignore
+            from sktk.knowledge import FaissBackend
 
             if FaissBackend is None:
                 raise ImportError("faiss backend requested but faiss is not installed")
@@ -324,7 +325,7 @@ class KnowledgeBase:
                 self._backend = FaissBackend(dim)
             return self._backend
         if self._backend_name == "hnsw":
-            from sktk.knowledge import HNSWBackend  # type: ignore
+            from sktk.knowledge import HNSWBackend
 
             if HNSWBackend is None:
                 raise ImportError("hnsw backend requested but hnswlib is not installed")

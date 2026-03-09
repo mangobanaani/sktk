@@ -220,6 +220,7 @@ class SKTKAgent:
         from sktk.team.topology import AgentNode, ParallelNode, SequentialNode
 
         left = AgentNode(agent=self)
+        right: AgentNode | SequentialNode | ParallelNode
         if isinstance(other, list):
             right = ParallelNode(
                 [AgentNode(agent=a) if isinstance(a, SKTKAgent) else a for a in other]
@@ -357,7 +358,7 @@ class SKTKAgent:
                 await self.session.history.append("user", prompt)
                 await self.session.history.append("assistant", response_text)
 
-            output = response_text
+            output: Any = response_text
             if self.output_contract is not None:
                 output = parse_output(response_text, self.output_contract)
 

@@ -27,7 +27,7 @@ class MetricsDispatcher:
         self._hook = hook
         self._queue: deque[tuple[str, dict[str, Any]]] = deque()
         self._max_queue = max_queue
-        self._task: asyncio.Task | None = None
+        self._task: asyncio.Task[None] | None = None
 
     async def start(self) -> None:
         if self._task is None:

@@ -329,7 +329,7 @@ class AgentRuntime:
                     "Passing response_format to service; provider must support structured output"
                 )
 
-            if hasattr(agent.service, "complete_with_metadata"):
+            if agent.service is not None and hasattr(agent.service, "complete_with_metadata"):
                 call = agent.service.complete_with_metadata(messages, **merged)
                 text, metadata = await self.await_with_timeout(call, timeout=timeout)
                 meta = dict(metadata)
@@ -374,6 +374,7 @@ class AgentRuntime:
 
                 return CompletionResult(text=text_str, tool_calls=tool_calls)
 
+            assert agent.service is not None
             call = agent.service.complete(messages, **merged)
             raw = await self.await_with_timeout(call, timeout=timeout)
             completion = normalize_completion_result(raw)

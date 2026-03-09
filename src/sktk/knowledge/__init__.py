@@ -8,11 +8,11 @@ from sktk.knowledge.grounding import GroundingConfig, GroundingFilter, Queryable
 from sktk.knowledge.knowledge_base import KnowledgeBase, TextSource
 
 try:
-    from sktk.knowledge.backends.faiss_backend import FaissBackend  # type: ignore
+    from sktk.knowledge.backends.faiss_backend import FaissBackend
 except Exception:  # pragma: no cover
     FaissBackend = None  # type: ignore
 try:
-    from sktk.knowledge.backends.hnsw_backend import HNSWBackend  # type: ignore
+    from sktk.knowledge.backends.hnsw_backend import HNSWBackend
 except Exception:  # pragma: no cover
     HNSWBackend = None  # type: ignore
 from sktk.knowledge.retrieval import (

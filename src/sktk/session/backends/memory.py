@@ -24,15 +24,15 @@ class InMemoryHistory(ConversationHistory):
     """In-memory conversation history backed by a plain list."""
 
     def __init__(self) -> None:
-        self._messages: list[dict] = []
+        self._messages: list[dict[str, Any]] = []
         self._lock = asyncio.Lock()
 
-    async def append(self, role: str, content: str, metadata: dict | None = None) -> None:
+    async def append(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> None:
         """Append a message to the in-memory list."""
         async with self._lock:
             self._messages.append({"role": role, "content": content, "metadata": metadata or {}})
 
-    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict]:
+    async def get(self, limit: int | None = None, roles: list[str] | None = None) -> list[dict[str, Any]]:
         """Return deep-copied messages, optionally filtered and limited."""
         async with self._lock:
             messages = self._messages
@@ -78,11 +78,11 @@ class InMemoryBlackboard(Blackboard):
         self._data: dict[str, str] = {}
         self._type_names: dict[str, str] = {}
         self._lock = asyncio.Lock()
-        self._watchers: dict[str, list[asyncio.Queue]] = {}
+        self._watchers: dict[str, list[asyncio.Queue[Any]]] = {}
 
     async def set(self, key: str, value: BaseModel) -> None:
         """Store a value and notify any watchers on that key."""
-        notifications: list[asyncio.Queue] = []
+        notifications: list[asyncio.Queue[Any]] = []
         async with self._lock:
             self._data[key] = value.model_dump_json()
             self._type_names[key] = type(value).__name__
@@ -123,7 +123,7 @@ class InMemoryBlackboard(Blackboard):
 
     async def watch(self, key: str) -> AsyncIterator[BaseModel]:
         """Yield new values for a key as they are set, using an asyncio.Queue per watcher."""
-        queue: asyncio.Queue = asyncio.Queue(maxsize=100)
+        queue: asyncio.Queue[Any] = asyncio.Queue(maxsize=100)
         async with self._lock:
             if key not in self._watchers:
                 self._watchers[key] = []

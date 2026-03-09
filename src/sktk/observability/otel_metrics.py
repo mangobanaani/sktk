@@ -33,7 +33,7 @@ def instrument_metrics(exporter: Any = None) -> None:
     _initialized = True
 
 
-def _get_meter():
+def _get_meter() -> Any:
     if _meter is None:
         instrument_metrics()
     return _meter
